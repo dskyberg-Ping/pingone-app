@@ -7,6 +7,13 @@
 	<version>1.0-SNAPSHOT</version>
 	<name>PingOneApp Maven Webapp</name>
 	<url>http://maven.apache.org</url>
+	<!-- This allows us to use the test phase to set up the database but ensure 
+		that it doesn't get blown away on subsequent launches, unless you really, 
+		really want it to. To actually set up the db, you need to run mvn test -DskipTests=false 
+
+	<properties>
+		<skipTests>true</skipTests>
+	</properties>-->
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>
@@ -74,7 +81,8 @@
 		<finalName>PingOneApp</finalName>
 		<resources>
 			<resource>
-				<!--  Fix up the main properties file that generates all other properties files -->
+				<!-- Fix up the main properties file that generates all other properties 
+					files -->
 				<directory>templates</directory>
 				<filtering>true</filtering>
 				<excludes>
@@ -82,6 +90,7 @@
 				</excludes>
 			</resource>
 		</resources>
+		<pluginManagement>
 		<plugins>
 			<plugin>
 				<groupId>org.eclipse.jetty</groupId>
@@ -145,6 +154,26 @@
 							</arguments>
 						</configuration>
 					</execution>
+					<execution>
+						<id>hypersql_setup</id>
+						<phase>process-resources</phase>
+						<goals>
+							<goal>java</goal>
+						</goals>
+						<configuration>
+							<includeProjectDependencies>true</includeProjectDependencies>
+							<includePluginDependencies>true</includePluginDependencies>
+							<mainClass>com.pingidentity.tools.moustache.Main</mainClass>
+							<arguments>
+								<argument>-template</argument>
+								<argument>${basedir}/templates/create_tables.sql.template</argument>
+								<arguement>-props</arguement>
+								<arguement>${project.build.outputDirectory}/template.properties</arguement>
+								<arguement>-out</arguement>
+								<arguement>${project.build.outputDirectory}/create_tables.sql</arguement>
+							</arguments>
+						</configuration>
+					</execution>
 				</executions>
 				<dependencies>
 					<dependency>
@@ -152,11 +181,68 @@
 						<artifactId>moustache</artifactId>
 						<version>1.1.0</version>
 					</dependency>
+					<dependency>
+						<groupId>org.hsqldb</groupId>
+						<artifactId>hsqldb</artifactId>
+						<version>2.3.1</version>
+					</dependency>
 				</dependencies>
 			</plugin>
-		</plugins>
-		<pluginManagement>
-			<plugins>
+			<!-- SQL Plugin to establish the HyperSQL db instance -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>sql-maven-plugin</artifactId>
+				<version>1.5</version>
+
+				<dependencies>
+					<!-- specify the dependent jdbc driver here -->
+					<dependency>
+						<groupId>org.hsqldb</groupId>
+						<artifactId>hsqldb</artifactId>
+						<version>2.3.1</version>
+					</dependency>
+				</dependencies>
+
+				<!-- common configuration shared by all executions -->
+				<configuration>
+					<driver>org.hsqldb.jdbcDriver</driver>
+					<url>jdbc:hsqldb:file:${project.build.outputDirectory}/database/db</url>
+					<username>SA</username>
+					<password>2Federate</password>
+					<!--all executions are ignored if -Dmaven.test.skip=true -->
+					<skip>${maven.test.skip}</skip>
+				</configuration>
+				<executions>
+
+                    <execution>
+                        <id>create-db</id>
+                        <phase>process-test-resources</phase>
+                        <goals>
+                            <goal>execute</goal>
+                        </goals>
+                        <configuration>
+                            <url>jdbc:hsqldb:file:${project.build.outputDirectory}/database/db</url>
+              <!-- no transaction -->
+                            <autocommit>true</autocommit>
+                            <sqlCommand>CREATE SCHEMA db AUTHORIZATION DBA</sqlCommand>
+                        </configuration>
+                    </execution>
+					<execution>
+						<id>create-tables</id>
+						<phase>process-test-resources</phase>
+						<goals>
+							<goal>execute</goal>
+						</goals>
+						<configuration>
+							<url>jdbc:hsqldb:file:${project.build.outputDirectory}/database/db</url>
+							<autocommit>true</autocommit>
+							<srcFiles>
+								<srcFile>${project.build.outputDirectory}/create_tables.sql</srcFile>
+							</srcFiles>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 				<!--This plugin's configuration is used to store Eclipse m2e settings 
 					only. It has no influence on the Maven build itself. -->
 				<plugin>

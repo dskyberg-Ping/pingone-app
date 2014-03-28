@@ -9,11 +9,10 @@
 	<url>http://maven.apache.org</url>
 	<!-- This allows us to use the test phase to set up the database but ensure 
 		that it doesn't get blown away on subsequent launches, unless you really, 
-		really want it to. To actually set up the db, you need to run mvn test -DskipTests=false 
-
+		really want it to. To actually set up the db, you need to run mvn test -DskipTests=false -->
 	<properties>
 		<skipTests>true</skipTests>
-	</properties>-->
+	</properties>
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>
@@ -37,39 +36,19 @@
 			<version>3.4.10</version>
 		</dependency>
 		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-core</artifactId>
-			<version>2.3.0</version>
-		</dependency>
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-annotations</artifactId>
-			<version>2.3.0</version>
-		</dependency>
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-databind</artifactId>
-			<version>2.3.0</version>
-		</dependency>
-		<dependency>
-			<groupId>javax.ws.rs</groupId>
-			<artifactId>javax.ws.rs-api</artifactId>
-			<version>2.0</version>
-		</dependency>
-		<dependency>
 			<groupId>org.glassfish.jersey.core</groupId>
 			<artifactId>jersey-client</artifactId>
-			<version>2.5</version>
+			<version>2.7</version>
 		</dependency>
 		<dependency>
 			<groupId>org.glassfish.jersey.containers</groupId>
 			<artifactId>jersey-container-servlet</artifactId>
-			<version>2.5</version>
+			<version>2.7</version>
 		</dependency>
 		<dependency>
-			<groupId>org.glassfish.jersey.media</groupId>
-			<artifactId>jersey-media-json-jackson</artifactId>
-			<version>2.5</version>
+			<groupId>com.fasterxml.jackson.jaxrs</groupId>
+			<artifactId>jackson-jaxrs-json-provider</artifactId>
+			<version>2.3.2</version>
 		</dependency>
 		<dependency>
 			<groupId>com.pingidentity.tools</groupId>
@@ -88,9 +67,9 @@
 				<excludes>
 					<exclude>**/*.template</exclude>
 				</excludes>
+				<targetPath>${basedir}/properties</targetPath>
 			</resource>
 		</resources>
-		<pluginManagement>
 		<plugins>
 			<plugin>
 				<groupId>org.eclipse.jetty</groupId>
@@ -101,80 +80,43 @@
 					<jettyXml>etc/jetty.xml,etc/jetty-http.xml,etc/jetty-ssl.xml,etc/jetty-https.xml</jettyXml>
 				</configuration>
 			</plugin>
+			<!-- Ensure that v1.7 of the JDK is used. This is required by some of 
+				the code. -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.1</version>
 				<configuration>
 					<source>1.7</source>
 					<target>1.7</target>
 				</configuration>
 			</plugin>
+			<!-- Moustache is used to generate the create_tables.sql file and the 
+				actual properties file for the app. This step requires the template.properties 
+				file that is generated as a filtered resource during the generate-resources 
+				phase. So, this step must occur in a phase after generate-resources. -->
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>exec-maven-plugin</artifactId>
 				<version>1.2.1</version>
 				<executions>
 					<execution>
-						<id>app_properties</id>
+						<id>app</id>
 						<phase>process-resources</phase>
 						<goals>
 							<goal>java</goal>
 						</goals>
-						<configuration>
-							<includeProjectDependencies>true</includeProjectDependencies>
-							<includePluginDependencies>true</includePluginDependencies>
-							<mainClass>com.pingidentity.tools.moustache.Main</mainClass>
-							<arguments>
-								<argument>-template</argument>
-								<argument>${basedir}/templates/app.properties.template</argument>
-								<arguement>-props</arguement>
-								<arguement>${project.build.outputDirectory}/template.properties</arguement>
-								<arguement>-out</arguement>
-								<arguement>${project.build.outputDirectory}/${project.artifactId}.properties</arguement>
-							</arguments>
-						</configuration>
-					</execution>
-					<execution>
-						<id>app_sql</id>
-						<phase>process-resources</phase>
-						<goals>
-							<goal>java</goal>
-						</goals>
-						<configuration>
-							<includeProjectDependencies>true</includeProjectDependencies>
-							<includePluginDependencies>true</includePluginDependencies>
-							<mainClass>com.pingidentity.tools.moustache.Main</mainClass>
-							<arguments>
-								<argument>-template</argument>
-								<argument>${basedir}/templates/create_tables.sql.template</argument>
-								<arguement>-props</arguement>
-								<arguement>${project.build.outputDirectory}/template.properties</arguement>
-								<arguement>-out</arguement>
-								<arguement>${project.build.outputDirectory}/create_tables.sql</arguement>
-							</arguments>
-						</configuration>
-					</execution>
-					<execution>
-						<id>hypersql_setup</id>
-						<phase>process-resources</phase>
-						<goals>
-							<goal>java</goal>
-						</goals>
-						<configuration>
-							<includeProjectDependencies>true</includeProjectDependencies>
-							<includePluginDependencies>true</includePluginDependencies>
-							<mainClass>com.pingidentity.tools.moustache.Main</mainClass>
-							<arguments>
-								<argument>-template</argument>
-								<argument>${basedir}/templates/create_tables.sql.template</argument>
-								<arguement>-props</arguement>
-								<arguement>${project.build.outputDirectory}/template.properties</arguement>
-								<arguement>-out</arguement>
-								<arguement>${project.build.outputDirectory}/create_tables.sql</arguement>
-							</arguments>
-						</configuration>
 					</execution>
 				</executions>
+				<configuration>
+					<includeProjectDependencies>true</includeProjectDependencies>
+					<includePluginDependencies>true</includePluginDependencies>
+					<mainClass>com.pingidentity.tools.moustache.Main</mainClass>
+					<arguments>
+						<argument>-script</argument>
+						<argument>${basedir}/properties/script.xml</argument>
+					</arguments>
+				</configuration>
 				<dependencies>
 					<dependency>
 						<groupId>com.pingidentity.tools</groupId>
@@ -193,7 +135,6 @@
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>sql-maven-plugin</artifactId>
 				<version>1.5</version>
-
 				<dependencies>
 					<!-- specify the dependent jdbc driver here -->
 					<dependency>
@@ -206,76 +147,59 @@
 				<!-- common configuration shared by all executions -->
 				<configuration>
 					<driver>org.hsqldb.jdbcDriver</driver>
-					<url>jdbc:hsqldb:file:${project.build.outputDirectory}/database/db</url>
+					<url>jdbc:hsqldb:file:${basedir}/database/db</url>
 					<username>SA</username>
 					<password>2Federate</password>
 					<!--all executions are ignored if -Dmaven.test.skip=true -->
 					<skip>${maven.test.skip}</skip>
 				</configuration>
 				<executions>
-
-                    <execution>
-                        <id>create-db</id>
-                        <phase>process-test-resources</phase>
-                        <goals>
-                            <goal>execute</goal>
-                        </goals>
-                        <configuration>
-                            <url>jdbc:hsqldb:file:${project.build.outputDirectory}/database/db</url>
-              <!-- no transaction -->
-                            <autocommit>true</autocommit>
-                            <sqlCommand>CREATE SCHEMA db AUTHORIZATION DBA</sqlCommand>
-                        </configuration>
-                    </execution>
 					<execution>
-						<id>create-tables</id>
+						<id>create-db</id>
 						<phase>process-test-resources</phase>
 						<goals>
 							<goal>execute</goal>
 						</goals>
 						<configuration>
-							<url>jdbc:hsqldb:file:${project.build.outputDirectory}/database/db</url>
-							<autocommit>true</autocommit>
 							<srcFiles>
-								<srcFile>${project.build.outputDirectory}/create_tables.sql</srcFile>
+								<srcFile>${basedir}/properties/create_tables.sql</srcFile>
 							</srcFiles>
 						</configuration>
 					</execution>
 				</executions>
 			</plugin>
-				<!--This plugin's configuration is used to store Eclipse m2e settings 
-					only. It has no influence on the Maven build itself. -->
-				<plugin>
-					<groupId>org.eclipse.m2e</groupId>
-					<artifactId>lifecycle-mapping</artifactId>
-					<version>1.0.0</version>
-					<configuration>
-						<lifecycleMappingMetadata>
-							<pluginExecutions>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>
-											org.codehaus.mojo
-										</groupId>
-										<artifactId>
-											exec-maven-plugin
-										</artifactId>
-										<versionRange>
-											[1.2.1,)
-										</versionRange>
-										<goals>
-											<goal>java</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<ignore></ignore>
-									</action>
-								</pluginExecution>
-							</pluginExecutions>
-						</lifecycleMappingMetadata>
-					</configuration>
-				</plugin>
-			</plugins>
-		</pluginManagement>
+			<!--This plugin's configuration is used to store Eclipse m2e settings 
+				only. It has no influence on the Maven build itself. -->
+			<plugin>
+				<groupId>org.eclipse.m2e</groupId>
+				<artifactId>lifecycle-mapping</artifactId>
+				<version>1.0.0</version>
+				<configuration>
+					<lifecycleMappingMetadata>
+						<pluginExecutions>
+							<pluginExecution>
+								<pluginExecutionFilter>
+									<groupId>
+										org.codehaus.mojo
+									</groupId>
+									<artifactId>
+										exec-maven-plugin
+									</artifactId>
+									<versionRange>
+										[1.2.1,)
+									</versionRange>
+									<goals>
+										<goal>java</goal>
+									</goals>
+								</pluginExecutionFilter>
+								<action>
+									<ignore></ignore>
+								</action>
+							</pluginExecution>
+						</pluginExecutions>
+					</lifecycleMappingMetadata>
+				</configuration>
+			</plugin>
+		</plugins>
 	</build>
 </project>

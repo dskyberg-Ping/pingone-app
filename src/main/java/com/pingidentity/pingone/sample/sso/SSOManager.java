@@ -23,7 +23,7 @@ import javax.ws.rs.core.Response;
 
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 import org.glassfish.jersey.filter.LoggingFilter;
-import org.glassfish.jersey.jackson.JacksonFeature;
+//import org.glassfish.jersey.jackson.JacksonFeature;
 
 import com.pingidentity.pingone.sample.model.Principal;
 
@@ -154,7 +154,7 @@ public class SSOManager {
 		
 		// Register the logger so we can watch the traffic between
 		// PingOne and our app
-		client.register(JacksonFeature.class).register(new LoggingFilter(logger, true));
+		//client.register(JacksonFeature.class).register(new LoggingFilter(logger, true));
 		
 		return client;
 	}

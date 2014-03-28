@@ -7,10 +7,10 @@
 <!-- and either jetty-https.xml or jetty-spdy.xml (but not both)   -->
 <!-- ============================================================= -->
 <Configure id="sslContextFactory" class="org.eclipse.jetty.util.ssl.SslContextFactory">
-  <Set name="KeyStorePath"><Property name="jetty.base" default="." />etc/demo_keystore.jks<Property name="jetty.keystore" default="etc/keystore"/></Set>
+  <Set name="KeyStorePath"><Property name="jetty.base" default="." />/<Property name="jetty.keystore" default="etc/demo_keystore.jks"/></Set>
   <Set name="KeyStorePassword">OBF:1iz01pw11sar1vg11t331vgt1saj1pyl1j1u</Set>
   <Set name="KeyManagerPassword">OBF:1iz01pw11sar1vg11t331vgt1saj1pyl1j1u</Set>
-  <Set name="TrustStorePath"><Property name="jetty.base" default="." />etc/demo_keystore.jks<Property name="jetty.truststore" default="etc/keystore"/></Set>
+  <Set name="TrustStorePath"><Property name="jetty.base" default="." />/<Property name="jetty.truststore" default="etc/demo_keystore.jks"/></Set>
   <Set name="TrustStorePassword">OBF:1iz01pw11sar1vg11t331vgt1saj1pyl1j1u</Set>
   <Set name="EndpointIdentificationAlgorithm"></Set>
   <Set name="ExcludeCipherSuites">

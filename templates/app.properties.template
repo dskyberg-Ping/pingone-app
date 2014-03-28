@@ -20,8 +20,8 @@
 
 [database<dev>]
 driver={{database.driver}}
-path={{database.path}}
-url=jdbc:hsqldb:file:${path}
+path={{database.absolute_path}}
+url=jdbc:hsqldb:file:${database.path}
 user={{database.user}}
 password={{database.password}}
 
@@ -29,9 +29,6 @@ password={{database.password}}
 client={{pingone.rest.client}}
 secret={{pingone.rest.secret}}
 baseurl={{pingone.rest.baseurl}}
-
-[pingone.saas<dev>]
-id={{pingone.saas.id}}
 
 [app.sso<dev>]
 success.redirect=/index.jsp

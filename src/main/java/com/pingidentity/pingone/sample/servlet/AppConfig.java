@@ -5,7 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
-import util.ResourceUtils;
+import com.pingidentity.util.ResourceUtils;
 import jodd.props.Props;
 
 public class AppConfig {

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<script>
+	<entries>
+		<entry>
+			<properties>/home/dskyberg/workspace/PingOneApp/properties/template.properties</properties>
+			<template>/home/dskyberg/workspace/PingOneApp/templates/app.properties.template</template>
+			<output>/home/dskyberg/workspace/PingOneApp/target/classes/PingOneApp.properties</output>
+		</entry>
+		<entry>
+			<properties>/home/dskyberg/workspace/PingOneApp/properties/template.properties</properties>
+			<template>/home/dskyberg/workspace/PingOneApp/templates/create_tables.sql.template</template>
+			<output>/home/dskyberg/workspace/PingOneApp/properties/create_tables.sql</output>
+		</entry>
+	</entries>	
+    <verbose>false</verbose>	
+</script>

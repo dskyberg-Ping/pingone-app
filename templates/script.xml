@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<script>
+	<entries>
+		<entry>
+			<properties>${basedir}/properties/template.properties</properties>
+			<template>${basedir}/templates/app.properties.template</template>
+			<output>${project.build.outputDirectory}/${project.build.finalName}.properties</output>
+		</entry>
+		<entry>
+			<properties>${basedir}/properties/template.properties</properties>
+			<template>${basedir}/templates/create_tables.sql.template</template>
+			<output>${basedir}/properties/create_tables.sql</output>
+		</entry>
+	</entries>	
+    <verbose>false</verbose>	
+</script>
